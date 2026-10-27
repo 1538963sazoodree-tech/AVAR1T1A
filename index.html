@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090b14">
+  <meta name="color-scheme" content="dark">
+  <title>AVAR1T1A - Cyberpunk Clicker</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #090b14; --panel: rgba(20, 25, 39, 0.7);
+      --text: #f3f5ff; --muted: #a5afc8;
+      --cyan: #00f0ff; --magenta: #ff003c; --purple: #b69aff; --gold: #ffdb83;
+      --nav-height: 76px;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { height: 100%; overflow: hidden; background: var(--bg); }
+    body {
+      height: 100%; margin: 0; overflow: hidden; color: var(--text);
+      background: radial-gradient(circle at 50% 0%, #1e1338 0%, #090b14 70%);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      transition: background-image 1s ease-in-out;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background: linear-gradient(180deg, rgba(9,11,20,0.4) 0%, rgba(9,11,20,0.8) 100%);
+      z-index: 1; pointer-events: none;
+    }
+    button, input { font: inherit; }
+    button { color: inherit; border: none; background: none; cursor: pointer; transition: all 150ms ease; }
+    button:active:not(:disabled) { transform: scale(0.92); filter: brightness(0.8); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(1); }
+    .app { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 600px; height: 100dvh; margin: 0 auto; padding: 10px 12px calc(var(--nav-height) + 15px) 12px; position: relative; z-index: 2; }
+    .header { display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+    .brand { font-size: 22px; font-weight: 900; letter-spacing: -1px; color: #fff; text-shadow: 0 0 10px var(--cyan), 0 0 20px var(--cyan); }
+    .brand span { color: var(--magenta); text-shadow: 0 0 10px var(--magenta), 0 0 20px var(--magenta); }
+    .header-badge { padding: 6px 12px; border-radius: 12px; background: rgba(255, 0, 60, 0.2); border: 1px solid var(--magenta); font-size: 10px; font-weight: 800; color: #ff8ca5; box-shadow: 0 0 15px rgba(255, 0, 60, 0.4); backdrop-filter: blur(5px); }
+    .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; z-index: 10; }
+    .stat { padding: 10px 6px; border-radius: 14px; background: rgba(10, 15, 24, 0.8); border: 1px solid rgba(0, 240, 255, 0.3); backdrop-filter: blur(10px); text-align: center; box-shadow: inset 0 0 10px rgba(0, 240, 255, 0.1); }
+    .stat-label { font-size: 8px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .stat-value { margin-top: 2px; font-size: 14px; font-weight: 900; text-shadow: 0 0 8px currentColor; }
+    .green { color: var(--cyan); }
+    .gold { color: var(--gold); text-shadow: 0 0 8px rgba(255, 219, 131, 0.5); }
+    .view { flex: 1; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; }
+    .home { display: flex; flex-direction: column; align-items: center; justify-content: space-between; height: 100%; position: relative; }
+    .pet-emoji { width: 100%; max-width: 500px; height: 100%; max-height: 55vh; flex: 1; display: grid; place-items: center; margin: 0; padding: 0; background: transparent; filter: drop-shadow(0 0 35px rgba(0, 240, 255, 0.5)); transition: transform 100ms cubic-bezier(0.175, 0.885, 0.32, 1.275); user-select: none; z-index: 1; touch-action: manipulation; }
+    .pet-emoji:active:not(:disabled) { transform: scale(0.92); filter: drop-shadow(0 0 60px rgba(255, 0, 60, 0.8)); }
+    .pet-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 0 30px rgba(0,240,255,0.5)); pointer-events: none; }
+    .pet-emoji.multiply-bg .pet-img { mix-blend-mode: multiply; }
+    .pet-name { margin-top: -10px; padding: 6px 30px; border-radius: 99px; background: linear-gradient(90deg, rgba(42,23,69,0.8), rgba(74,37,122,0.8), rgba(42,23,69,0.8)); border: 1px solid var(--purple); box-shadow: 0 0 20px var(--purple), inset 0 0 15px var(--purple); color: #fff; font-weight: 900; font-size: 16px; z-index: 10; text-shadow: 0 0 5px #fff; backdrop-filter: blur(5px); }
+    .pet-caption { font-size: 11px; color: var(--cyan); margin-top: 4px; font-weight: bold; z-index: 10; text-shadow: 0 0 5px var(--cyan); }
+    .energy-panel { width: 100%; max-width: 400px; padding: 12px 16px; border-radius: 16px; background: rgba(10, 15, 24, 0.8); border: 1px solid var(--cyan); backdrop-filter: blur(10px); z-index: 10; margin-bottom: 10px; box-shadow: 0 0 15px rgba(0, 240, 255, 0.2); }
+    .energy-row { display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-bottom: 4px; color: var(--cyan); }
+    progress { width: 100%; height: 8px; border-radius: 99px; background: rgba(255,255,255,0.1); border: none; appearance: none; }
+    progress::-webkit-progress-bar { border-radius: 99px; background: rgba(255,255,255,0.1); }
+    progress::-webkit-progress-value { border-radius: 99px; background: linear-gradient(90deg, var(--cyan), #fff); box-shadow: 0 0 10px var(--cyan); }
+    .combo-display { position: fixed; top: 30%; left: 50%; transform: translateX(-50%); font-size: 32px; font-weight: 900; color: var(--magenta); text-shadow: 0 0 20px var(--magenta); pointer-events: none; opacity: 0; transition: opacity 0.2s; z-index: 100; }
+    .combo-active { opacity: 1; }
+    .btn { padding: 12px; border-radius: 12px; font-weight: 900; font-size: 13px; width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    .btn-green { background: linear-gradient(135deg, #059669, #10b981); border: 1px solid #34d399; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); color: white; }
+    .btn-purple { background: linear-gradient(135deg, #6d28d9, #8b5cf6); border: 1px solid #a78bfa; box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); color: white; }
+    .btn-gold { background: linear-gradient(135deg, #b45309, #fbbf24); border: 1px solid #fcd34d; box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); color: #fff; }
+    .btn-red { background: linear-gradient(135deg, #991b1b, #ef4444); border: 1px solid #f87171; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); color: white; }
+    .btn-orange { background: linear-gradient(135deg, #c2410c, #f97316); border: 1px solid #fdba74; box-shadow: 0 0 15px rgba(249, 115, 22, 0.4); color: white; }
+    .card { background: rgba(10, 15, 24, 0.85); border: 1px solid rgba(0, 240, 255, 0.2); border-radius: 16px; padding: 14px; margin-bottom: 10px; backdrop-filter: blur(10px); box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+    .card-top { display: flex; align-items: center; gap: 10px; }
+    .icon { width: 42px; height: 42px; border-radius: 12px; background: rgba(0, 240, 255, 0.1); border: 1px solid var(--cyan); display: grid; place-items: center; font-size: 22px; box-shadow: 0 0 10px rgba(0, 240, 255, 0.3); }
+    .card-info { flex: 1; }
+    .card-name { font-size: 14px; font-weight: 800; margin-bottom: 2px; color: #fff; text-shadow: 0 0 5px rgba(255,255,255,0.5); }
+    .card-income { font-size: 11px; color: var(--cyan); }
+    .badge { padding: 4px 8px; border-radius: 8px; background: rgba(255, 0, 60, 0.1); border: 1px solid var(--magenta); font-size: 10px; font-weight: bold; color: #ff8ca5; }
+    .card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px; }
+    .price { font-size: 15px; font-weight: 900; color: var(--gold); text-shadow: 0 0 8px var(--gold); }
+    .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+    .tab { flex: 1; padding: 10px; border-radius: 12px; background: rgba(255,255,255,0.05); font-weight: bold; font-size: 12px; color: var(--muted); border: 1px solid transparent; }
+    .tab.active { background: rgba(0, 240, 255, 0.1); border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 10px rgba(0, 240, 255, 0.3); }
+    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 600px; height: var(--nav-height); display: flex; justify-content: space-around; align-items: center; background: rgba(9, 11, 20, 0.95); backdrop-filter: blur(20px); border-top: 1px solid var(--cyan); border-radius: 24px 24px 0 0; padding-bottom: env(safe-area-inset-bottom); z-index: 100; box-shadow: 0 -5px 30px rgba(0, 240, 255, 0.3); }
+    .nav-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 9px; font-weight: bold; color: var(--muted); padding: 8px 12px; border-radius: 12px; transition: all 0.3s ease; }
+    .nav-btn.active { color: var(--cyan); background: rgba(0, 240, 255, 0.15); text-shadow: 0 0 10px var(--cyan); box-shadow: inset 0 0 15px rgba(0, 240, 255, 0.2); border: 1px solid var(--cyan); }
+    .nav-icon { font-size: 22px; filter: drop-shadow(0 0 5px currentColor); }
+    dialog { width: 95%; max-width: 450px; padding: 20px; border-radius: 20px; background: #0d1120; border: 1px solid var(--cyan); color: white; box-shadow: 0 0 50px rgba(0, 240, 255, 0.2); overflow: hidden; }
+    dialog::backdrop { background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(0, 240, 255, 0.3); padding-bottom: 10px; }
+    .modal-title { font-size: 18px; font-weight: 900; margin: 0; color: #fff; text-shadow: 0 0 10px var(--cyan); }
+    #modal-body { max-height: 65vh; overflow-y: auto; padding-right: 5px; }
+    #modal-body::-webkit-scrollbar { width: 4px; }
+    #modal-body::-webkit-scrollbar-thumb { background: var(--cyan); border-radius: 4px; }
+    .modal-win-msg { background: rgba(0, 240, 255, 0.15); border: 1px solid var(--cyan); color: var(--cyan); padding: 12px; border-radius: 10px; text-align: center; font-weight: bold; margin-bottom: 15px; animation: pulse 1s infinite; text-shadow: 0 0 5px var(--cyan); font-size: 14px; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+    .tap-particle { position: fixed; font-size: 22px; font-weight: 900; color: var(--cyan); text-shadow: 0 0 10px #000; pointer-events: none; animation: floatUp 0.8s ease-out forwards; z-index: 1000; }
+    @keyframes floatUp { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.8); } 100% { opacity: 0; transform: translate(-50%, -150px) scale(1.2); } }
+    .event-btn { position: absolute; top: 10px; right: 10px; padding: 10px 14px; background: linear-gradient(135deg, #ff003c, #a8002a); border: 2px solid #ff8ca5; border-radius: 12px; color: white; font-weight: 900; display: flex; flex-direction: column; align-items: center; box-shadow: 0 0 20px rgba(255, 0, 60, 0.8); animation: pulseRed 1.5s infinite; z-index: 20; }
+    @keyframes pulseRed { 0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 0, 60, 0.8); } 50% { transform: scale(1.1); box-shadow: 0 0 40px rgba(255, 0, 60, 1); } 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 0, 60, 0.8); } }
+    .arcade-container { position: relative; width: 100%; height: 350px; background: linear-gradient(180deg, rgba(10,15,24,0.9), rgba(30,19,56,0.9)), repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(0,240,255,0.1) 20px, rgba(0,240,255,0.1) 21px), repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(0,240,255,0.1) 20px, rgba(0,240,255,0.1) 21px); border: 3px solid var(--cyan); border-radius: 16px; overflow: hidden; touch-action: none; box-shadow: inset 0 0 60px rgba(0, 240, 255, 0.3), 0 0 25px rgba(0, 240, 255, 0.6); }
+    .arcade-player { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); width: 60px; height: 15px; background: var(--cyan); border-radius: 10px; box-shadow: 0 0 25px var(--cyan), 0 0 10px #fff inset; z-index: 10; }
+    .falling-item { position: absolute; font-size: 30px; display: grid; place-items: center; width: 40px; height: 40px; z-index: 5; filter: drop-shadow(0 0 8px #fff); }
+    .arcade-ui { display: flex; justify-content: space-between; font-size: 16px; font-weight: 900; margin-bottom: 10px; color: white; background: rgba(0,240,255,0.05); padding: 10px; border-radius: 10px; border: 1px solid var(--cyan); box-shadow: 0 0 15px rgba(0,240,255,0.2); }
+    .lives { color: var(--magenta); text-shadow: 0 0 10px var(--magenta); }
+    .arcade-start-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 20; gap: 10px; backdrop-filter: blur(5px); }
+    .game-board { position: relative; width: 100%; height: 300px; background: #0a0f18; border: 3px solid var(--magenta); border-radius: 16px; overflow: hidden; margin-top: 10px; box-shadow: inset 0 0 60px rgba(255, 0, 60, 0.3), 0 0 25px rgba(255, 0, 60, 0.6); background-image: repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(255,0,60,0.1) 20px, rgba(255,0,60,0.1) 21px), repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(255,0,60,0.1) 20px, rgba(255,0,60,0.1) 21px); }
+    .target { position: absolute; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-size: 20px; border: 2px solid white; cursor: crosshair; animation: pop 0.2s ease-out; }
+    .target.virus { background: var(--magenta); box-shadow: 0 0 15px var(--magenta); }
+    .target.bomb { background: black; border-color: var(--magenta); box-shadow: 0 0 15px black; }
+    @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+    .hack-pattern { font-size: 36px; text-align: center; letter-spacing: 10px; margin: 20px 0; text-shadow: 0 0 15px var(--cyan); }
+    .hack-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    .hack-status { text-align: center; margin-top: 15px; font-weight: bold; font-size: 14px; }
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0, 240, 255, 0.9); color: #000; font-weight: 900; padding: 12px 24px; border-radius: 99px; box-shadow: 0 5px 30px rgba(0, 240, 255, 0.5); z-index: 1000; animation: dropDown 0.3s ease; text-transform: uppercase; letter-spacing: 1px; font-size: 12px; }
+    @keyframes dropDown { from { top: -50px; } to { top: 20px; } }
+    .autoclicker-panel { margin-top: 10px; display: flex; gap: 10px; justify-content: center; width: 100%; }
+    .auto-btn { background: linear-gradient(135deg, #4c1d95, #7c3aed); border: 1px solid #a78bfa; box-shadow: 0 0 15px rgba(124, 58, 237, 0.5); padding: 10px 15px; border-radius: 99px; font-size: 11px; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 5px; flex: 1; justify-content: center; }
+    .auto-btn.active { background: linear-gradient(135deg, #065f46, #10b981); border-color: #34d399; box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
+    .overdrive-btn { background: linear-gradient(135deg, #b91c1c, #ef4444); border: 1px solid #f87171; box-shadow: 0 0 15px rgba(239, 68, 68, 0.5); padding: 10px 15px; border-radius: 99px; font-size: 11px; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 5px; flex: 1; justify-content: center; animation: pulseRed 2s infinite; }
+    .overdrive-btn:disabled { animation: none; opacity: 0.5; }
+    .achievements-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+    .achievement-item { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 10px; text-align: center; transition: all 0.3s; }
+    .achievement-item.unlocked { background: rgba(0, 240, 255, 0.1); border-color: var(--cyan); box-shadow: 0 0 10px rgba(0, 240, 255, 0.3); }
+    .ach-icon { font-size: 24px; margin-bottom: 5px; opacity: 0.5; }
+    .achievement-item.unlocked .ach-icon { opacity: 1; filter: drop-shadow(0 0 5px var(--gold)); }
+    .ach-name { font-size: 9px; font-weight: bold; color: var(--muted); }
+    .achievement-item.unlocked .ach-name { color: #fff; }
+    .leaderboard-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+    .leaderboard-row:last-child { border-bottom: none; }
+    .lb-rank { font-weight: 900; color: var(--gold); width: 30px; }
+    .lb-name { flex: 1; font-weight: bold; }
+    .lb-score { color: var(--cyan); font-weight: bold; }
+    .leaderboard-row.me { background: rgba(0, 240, 255, 0.1); border-radius: 8px; border: 1px solid var(--cyan); margin-top: 5px; }
+    .synergy-tag { font-size: 10px; color: var(--gold); margin-top: 3px; font-weight: bold; text-shadow: 0 0 5px rgba(255,219,131,0.5); }
+    .core-badge { display: inline-block; padding: 4px 10px; background: rgba(182, 154, 255, 0.15); border: 1px solid var(--purple); border-radius: 99px; font-size: 11px; font-weight: bold; color: var(--purple); margin: 0 5px; text-shadow: 0 0 5px var(--purple); }
+    .heart-particle { position: fixed; pointer-events: none; z-index: 9999; font-size: 28px; line-height: 1; user-select: none; will-change: transform, opacity; transform: translate(-50%, -50%) scale(0.4); opacity: 0; animation: flyUpHeart 1.8s ease-out forwards; }
+    @keyframes flyUpHeart { 0% { transform: translate(-50%, -50%) scale(0.3) rotate(0deg); opacity: 0; } 12% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); } 100% { transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% - 240px - var(--dy, 0px))) scale(1.5) rotate(var(--rot, 0deg)); opacity: 0; } }
+  </style>
+  <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
+</head>
+<body>
+  <main class="app">
+    <header class="header">
+      <div class="brand">AVAR<span>1T1A</span></div>
+      <div class="header-badge">LVL <span id="header-level">1</span></div>
+    </header>
+
+    <div class="stats">
+      <div class="stat"><div class="stat-label">Баланс</div><div class="stat-value green">💎 <span id="balance">0</span></div></div>
+      <div class="stat"><div class="stat-label">Доход</div><div class="stat-value green"><span id="income">0</span>/с</div></div>
+      <div class="stat"><div class="stat-label">Звёзды</div><div class="stat-value gold">⭐ <span id="stars">0</span></div></div>
+    </div>
+
+    <section class="view home" id="view-home">
+      <div id="combo-display" class="combo-display">x0</div>
+      <button class="event-btn" id="hack-btn" hidden><span>💀</span> ВЗЛОМ</button>
+      <div class="pet-level" id="pet-level" style="font-size: 9px; padding: 4px 10px; background: rgba(0,0,0,0.5); border-radius: 99px; border: 1px solid var(--cyan); margin-top: 5px; color: var(--cyan); box-shadow: 0 0 10px rgba(0,240,255,0.3);">Ур. 1</div>
+      <button class="pet-emoji" id="pet-emoji" type="button">🐈‍⬛</button>
+      <div style="text-align: center; z-index: 10;">
+        <div class="pet-name" id="pet-name">Стартовый кот</div>
+        <div class="pet-caption" id="pet-income">Тапай и зарабатывай</div>
+      </div>
+      <div class="autoclicker-panel">
+        <button class="auto-btn" id="auto-btn" onclick="activateAuto()"><span>🤖</span> АВТО (5м)</button>
+        <button class="overdrive-btn" id="overdrive-btn" onclick="activateOverdrive()"><span>🔥</span> ОВЕРДРАЙВ</button>
+      </div>
+      <button class="btn btn-gold" style="max-width: 400px; margin-bottom: 10px;" id="btn-daily-chest" onclick="openDailyChest()">
+        <span style="font-size: 20px;">🎁</span> <span id="chest-label">ЕЖЕДНЕВНЫЙ СУНДУК</span>
+      </button>
+      <div class="energy-panel">
+        <div class="energy-row"><span>⚡ ЭНЕРГИЯ</span><span><span id="energy">1000</span> / 1000</span></div>
+        <progress id="energy-bar" value="1000" max="1000"></progress>
+        <div style="text-align: center; font-size: 10px; color: var(--cyan); margin-top: 6px; font-weight: bold;" id="tap-reward">+1 💎 ЗА ТАП</div>
+      </div>
+    </section>
+
+    <section class="view" id="view-upgrade" hidden>
+      <h1 style="font-size: 20px; margin: 5px 0 15px; text-shadow: 0 0 10px var(--cyan);">ПРОКАЧКА</h1>
+      <div class="card" style="border-color: var(--cyan);">
+        <div class="card-top">
+          <div class="icon">⚡</div>
+          <div class="card-info"><div class="card-name">Сила Тапа</div><div class="card-income">Увеличивает награду</div></div>
+          <div class="badge" id="tap-level-badge">Ур. 1</div>
+        </div>
+        <div class="card-bottom">
+          <div class="price" id="tap-upgrade-price">100 💎</div>
+          <button class="btn btn-purple" style="width: auto; padding: 8px 16px; font-size: 12px;" id="upgrade-tap">Улучшить</button>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" id="tab-biz">🏢 БИЗНЕСЫ</button>
+        <button class="tab" id="tab-pets">🐾 ПИТОМЦЫ</button>
+      </div>
+      <div id="list-biz"></div>
+      <div id="list-pets" hidden></div>
+    </section>
+
+    <section class="view" id="view-shop" hidden>
+      <h1 style="font-size: 20px; margin: 5px 0 15px; text-shadow: 0 0 10px var(--cyan);">МАГАЗИН</h1>
+      <div class="card">
+        <div class="energy-row"><span style="color: var(--magenta);">🍖 СЫТОСТЬ</span><span id="satiety-val">100 / 100</span></div>
+        <progress id="satiety-bar" max="100" value="100" style="accent-color: var(--magenta);"></progress>
+        <div style="text-align: center; font-size: 11px; margin-top: 8px; font-weight: bold; color: var(--magenta);" id="satiety-text">Питомец сыт</div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+        <button class="btn btn-green" style="flex-direction: column; height: 90px;" id="btn-food"><span style="font-size: 28px;">🍔</span> ЕДА</button>
+        <button class="btn btn-green" style="flex-direction: column; height: 90px;" id="btn-chests"><span style="font-size: 28px;">🎁</span> СУНДУКИ</button>
+      </div>
+      <button class="btn btn-red" style="flex-direction: column; height: 110px; margin-bottom: 10px;" id="btn-blackmarket">
+        <span style="font-size: 36px; text-shadow: 0 0 10px red;">☠️</span>
+        <span style="font-size: 16px;">ЧЕРНЫЙ РЫНОК</span>
+        <span style="font-size: 10px; color: #ffb3b3;" id="bm-cost-text">Стоимость: 5M 💎</span>
+      </button>
+      
+      <!-- 👇 БЛОК ФОНОВ 👇 -->
+      <h2 style="font-size: 18px; margin: 20px 0 10px; color: var(--purple); text-shadow: 0 0 10px var(--purple);">🖼️ СТИЛИ ИНТЕРФЕЙСА</h2>
+      <div id="bg-shop-list"></div>
+      <!-- 👆 КОНЕЦ БЛОКА ФОНОВ 👆 -->
+
+      <h2 style="font-size: 18px; margin: 20px 0 10px; color: var(--gold); text-shadow: 0 0 10px var(--gold);">⭐ МАГАЗИН ЗВЕЗД</h2>
+      <div id="star-shop-list"></div>
+    </section>
+
+    <section class="view" id="view-tasks" hidden>
+      <h1 style="font-size: 20px; margin: 5px 0 15px; text-shadow: 0 0 10px var(--cyan);">ЗАДАНИЯ И АРКАДЫ</h1>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+        <button class="btn btn-purple" style="flex-direction: column; height: 100px;" id="btn-arcade"><span style="font-size: 32px;">🕹️</span> КИБЕР-ЛОВЕЦ</button>
+        <button class="btn btn-red" style="flex-direction: column; height: 100px;" id="btn-shooter"><span style="font-size: 32px;">🎯</span> КИБЕР-ТИР</button>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+        <button class="btn btn-purple" style="flex-direction: column; height: 90px;" id="btn-wheel"><span style="font-size: 28px;">🎡</span> КОЛЕСО</button>
+        <button class="btn btn-gold" style="flex-direction: column; height: 90px;" id="btn-lottery"><span style="font-size: 28px;">🎰</span> ЛОТЕРЕЯ</button>
+      </div>
+      <button class="btn btn-purple" style="height: 60px; margin-bottom: 10px; font-size: 14px;" onclick="openSocial()">
+        <span style="font-size: 20px;">📱</span> СОЦ. ЗАДАНИЯ <span id="social-badge" style="background: var(--magenta); color: white; padding: 2px 8px; border-radius: 99px; font-size: 11px; margin-left: 8px;">0/4</span>
+      </button>
+      <button class="btn btn-orange" style="height: 60px; margin-bottom: 10px; font-size: 14px;" onclick="openClans()">
+        <span style="font-size: 20px;">🛡️</span> КЛАНЫ
+      </button>
+      <button class="btn btn-red" style="height: 60px; margin-bottom: 10px; font-size: 14px;" onclick="openSteal()">
+        <span style="font-size: 20px;">🤑</span> ВОРОВСТВО <span id="steal-badge" style="background: var(--magenta); color: white; padding: 2px 8px; border-radius: 99px; font-size: 11px; margin-left: 8px;">3/3</span>
+      </button>
+      <button class="btn btn-gold" style="height: 70px; margin-bottom: 15px; font-size: 16px;" onclick="openBattlePass()">
+        <span style="font-size: 24px;">🎫</span> BATTLE PASS <span id="bp-badge" style="background: var(--magenta); color: white; padding: 2px 8px; border-radius: 99px; font-size: 11px; margin-left: 8px;">0/30</span>
+      </button>
+      <div class="card">
+        <h2 style="font-size: 16px; margin-bottom: 10px; color: var(--cyan); text-shadow: 0 0 10px var(--cyan);">ЕЖЕДНЕВНЫЕ ЗАДАНИЯ</h2>
+        <div id="quest-list"></div>
+      </div>
+      <div class="card">
+        <h2 style="font-size: 16px; margin-bottom: 10px; color: var(--gold); text-shadow: 0 0 10px var(--gold);">🏆 ТОП ИГРОКОВ</h2>
+        <div id="leaderboard-list"></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-profile" hidden>
+      <h1 style="font-size: 20px; margin: 5px 0 15px; text-shadow: 0 0 10px var(--cyan);">ПРОФИЛЬ</h1>
+      <div class="card">
+        <div class="card-top">
+          <div class="icon" style="background: #362b51; border-color: var(--purple);">👤</div>
+          <div class="card-info"><div class="card-name" id="profile-name">Игрок</div><div style="font-size: 11px; color: var(--cyan);" id="player-id">ID: ...</div></div>
+          <button class="btn btn-purple" style="width: auto; padding: 6px 10px; font-size: 10px;" onclick="openStats()">СТАТЫ</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2 style="font-size: 16px; margin-bottom: 10px; color: var(--cyan);">🏅 ДОСТИЖЕНИЯ</h2>
+        <div class="achievements-grid" id="achievements-list"></div>
+      </div>
+      <div class="card" style="border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 219, 131, 0.2);">
+        <h2 style="font-size: 16px; margin-bottom: 10px; color: var(--gold);">⭐ ОБМЕННИК</h2>
+        <div style="font-size: 18px; font-weight: 900; text-align: center; margin: 10px 0; color: var(--gold); text-shadow: 0 0 10px var(--gold);" id="exchange-price">1M 💎 = 1 ⭐</div>
+        <button class="btn btn-gold" id="exchange-btn">Обменять</button>
+        <div style="font-size: 10px; color: var(--muted); text-align: center; margin-top: 10px;">Лимит: 5 звезд в день</div>
+      </div>
+
+      <div class="card" style="border-color: var(--purple); box-shadow: 0 0 20px rgba(182, 154, 255, 0.3);">
+        <h2 style="font-size: 16px; color: var(--purple); text-shadow: 0 0 10px var(--purple);">🌌 ДРЕВО ТАЛАНТОВ</h2>
+        <p style="font-size: 11px; color: var(--muted); margin: 5px 0;">Ядра: <span class="core-badge" id="cores-count">0</span></p>
+        <button class="btn btn-purple" style="margin-top: 10px;" onclick="openPrestigeTree()">ОТКРЫТЬ ДРЕВО</button>
+      </div>
+
+      <div class="card" style="border-color: var(--magenta); box-shadow: 0 0 20px rgba(255, 0, 60, 0.3);">
+        <h2 style="font-size: 16px; color: var(--magenta); text-shadow: 0 0 10px var(--magenta);">🔥 РЕИНКАРНАЦИЯ</h2>
+        <p style="font-size: 11px; color: var(--muted); margin: 5px 0;">Сбрось прогресс, получи +50% к доходу и +1 Ядро Сингулярности.</p>
+        <div style="font-size: 12px; margin: 10px 0;">Множитель: <b id="prestige-mult" style="color:var(--magenta); font-size: 16px;">x1</b></div>
+        <button class="btn btn-red" onclick="doPrestige()">Реинкарнировать (100B 💎)</button>
+      </div>
+
+      <div class="card">
+        <form id="promo-form" style="display: flex; gap: 8px;">
+          <input id="promo-input" type="text" placeholder="Промокод" style="flex: 1; padding: 10px; border-radius: 10px; border: 1px solid var(--cyan); background: #0a0f18; color: white; outline: none; font-weight: bold;">
+          <button class="btn btn-purple" type="submit" style="width: auto; padding: 0 16px; font-size: 12px;">Ввод</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" data-target="home"><span class="nav-icon">🏠</span>Главная</button>
+    <button class="nav-btn" data-target="upgrade"><span class="nav-icon">⬆️</span>Прокачка</button>
+    <button class="nav-btn" data-target="shop"><span class="nav-icon">🛒</span>Магазин</button>
+    <button class="nav-btn" data-target="tasks"><span class="nav-icon">📜</span>Задания</button>
+    <button class="nav-btn" data-target="profile"><span class="nav-icon">👤</span>Профиль</button>
+  </nav>
+
+  <dialog id="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-title"></h2>
+      <button id="modal-close" style="font-size: 20px; color: var(--cyan); text-shadow: 0 0 10px var(--cyan);">✕</button>
+    </div>
+    <div id="modal-win-msg" class="modal-win-msg" hidden></div>
+    <div id="modal-body"></div>
+  </dialog>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <!-- ПОДКЛЮЧАЕМ ДВИЖОК -->
+  <script src="game.js"></script>
+</body>
+                                                </html>
